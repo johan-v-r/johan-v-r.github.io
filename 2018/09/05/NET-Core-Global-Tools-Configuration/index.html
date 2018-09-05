@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>.NET Core Global Tools Configuration | JvR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="TL;DR:Nate McMaster’s post provides a really nice and detailed explanation on how to configure your csproj to build your app as a tool.   12345&amp;lt;PropertyGroup&amp;gt;  &amp;lt;PackAsTool&amp;gt;true&amp;lt;/PackAsT">
+<meta property="og:type" content="article">
+<meta property="og:title" content=".NET Core Global Tools Configuration">
+<meta property="og:url" content="https://johan-v-r.github.io/2018/09/05/NET-Core-Global-Tools-Configuration/index.html">
+<meta property="og:site_name" content="JvR">
+<meta property="og:description" content="TL;DR:Nate McMaster’s post provides a really nice and detailed explanation on how to configure your csproj to build your app as a tool.   12345&amp;lt;PropertyGroup&amp;gt;  &amp;lt;PackAsTool&amp;gt;true&amp;lt;/PackAsT">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-09-05T15:52:14.737Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content=".NET Core Global Tools Configuration">
+<meta name="twitter:description" content="TL;DR:Nate McMaster’s post provides a really nice and detailed explanation on how to configure your csproj to build your app as a tool.   12345&amp;lt;PropertyGroup&amp;gt;  &amp;lt;PackAsTool&amp;gt;true&amp;lt;/PackAsT">
+  
+    <link rel="alternate" href="/atom.xml" title="JvR" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">JvR</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Developer; Red Devil; Rock n Roll;</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johan-v-r.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-NET-Core-Global-Tools-Configuration" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/05/NET-Core-Global-Tools-Configuration/" class="article-date">
+  <time datetime="2018-09-05T15:16:55.000Z" itemprop="datePublished">2018-09-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      .NET Core Global Tools Configuration
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="TL-DR"><a href="#TL-DR" class="headerlink" title="TL;DR:"></a>TL;DR:</h2><p><a href="https://natemcmaster.com/blog/2018/05/12/dotnet-global-tools/" target="_blank" rel="noopener">Nate McMaster’s post</a> provides a really nice and detailed explanation on how to configure your <code>csproj</code> to build your app as a tool.  </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">PackAsTool</span>&gt;</span>true<span class="tag">&lt;/<span class="name">PackAsTool</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">OutputType</span>&gt;</span>Exe<span class="tag">&lt;/<span class="name">OutputType</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFramework</span>&gt;</span>netcoreapp2.1<span class="tag">&lt;/<span class="name">TargetFramework</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Build with <code>dotnet pack</code> (creates NuGet package to be published)  </p>
+<blockquote>
+<p>Nice to test by setting up your own <a href="https://docs.microsoft.com/en-us/nuget/hosting-packages/nuget-server" target="_blank" rel="noopener">NuGet.Server</a></p>
+</blockquote>
+<hr>
+<h2 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h2><p>The above is quite simple and works as expected. However, some projects might require more configuration.  </p>
+<p>I wanted to package an existing console app as a .NET global tool, whilst still keeping the current console apps (multi-target) capabilities. So my original configuration was the standard multi-target specification:  </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFrameworks</span>&gt;</span>netcoreapp2.1;net472<span class="tag">&lt;/<span class="name">TargetFrameworks</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>After adding the <code>&lt;PackAsTool&gt;true&lt;/PackAsTool&gt;</code> to this configuration the NuGet package failed to build, stating that <em>…Microsoft.NET.PackTool.targets(32,5): error NETSDK1054: only supports .NET Core…</em>  </p>
+<p>I really didn’t want to create a new project, so I eventually got the NuGet package building by splitting out the <code>PackAsTool</code> into a specific .NET Core 2.1 <code>PropertyGroup</code>:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFrameworks</span>&gt;</span>netcoreapp2.1;net472<span class="tag">&lt;/<span class="name">TargetFrameworks</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span> <span class="attr">Condition</span>=<span class="string">"'$(TargetFramework)' == 'netcoreapp2.1'"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">PackAsTool</span>&gt;</span>true<span class="tag">&lt;/<span class="name">PackAsTool</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>The package now contained the console in their respective framework’s <code>lib</code> folder, as well as the <code>netcoreapp2.1</code> in the <code>tools</code> folder. This package was hosted successfully, but <strong>could NOT be installed</strong>.  </p>
+<p>The final result was to build separate NuGet packages. This also meant giving them different names. So I just used a random made-up condition (<code>GlobalTool</code>) and kept the original <code>PropertyGroup</code> with its default name, and specifying my tool with an explicit <code>netcoreapp.1</code> framework a new <code>PackageId</code>:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span> <span class="attr">Condition</span>=<span class="string">"'$(GlobalTool)' != true"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFrameworks</span>&gt;</span>netcoreapp2.1;net472<span class="tag">&lt;/<span class="name">TargetFrameworks</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span> <span class="attr">Condition</span>=<span class="string">"'$(GlobalTool)' == true"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">PackAsTool</span>&gt;</span>true<span class="tag">&lt;/<span class="name">PackAsTool</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFramework</span>&gt;</span>netcoreapp2.1<span class="tag">&lt;/<span class="name">TargetFramework</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">PackageId</span>&gt;</span>Foo-Tool<span class="tag">&lt;/<span class="name">PackageId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>Note the use of <code>Condition=&quot;&#39;$(GlobalTool)&#39; != true&quot;</code> instead of <code>Condition=&quot;&#39;$(GlobalTool)&#39; == false&quot;</code> made my default build &amp; pack use that <code>PropertyGroup</code>.  </p>
+</blockquote>
+<p>It’s also possible to add (override) any other <a href="https://docs.microsoft.com/en-us/dotnet/core/tools/csproj#nuget-metadata-properties" target="_blank" rel="noopener">NuGet metadata properties</a> (i.e. Description) in these sections.</p>
+<p>Now my pack process looks like this:  </p>
+<pre><code>dotnet pack  
+dotnet pack /p:GlobalTool=true
+</code></pre><p>This results in 2 NuGet packages, which are both uploaded and can be installed independently. You can then install the global tool with <code>dotnet tool install -g foo-tool</code> </p>
+<p> Because the <a href="https://natemcmaster.com/blog/2018/05/12/dotnet-global-tools/#package-authoring-and-sdk" target="_blank" rel="noopener"><code>ToolCommandName</code></a> defaults to the name of the assembly name, you are still able to use it with <code>foo</code>.  </p>
+<hr>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p> I was pleasantly surprised with the flexibility of the <code>csproj</code> configuration. Making this possible took some digging and experimentation, but good exercise to step outside of the standard tooling.  </p>
+<p> It’s still very early for the .NET Core global tools, but still awesome and can see this being widely adopted soon.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johan-v-r.github.io/2018/09/05/NET-Core-Global-Tools-Configuration/" data-id="cjlpbuxcl0001ach1ecbk63zw" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/01/26/Xamarin-Forms-Chat-Bot/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Xamarin Forms Chat Bot</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/05/NET-Core-Global-Tools-Configuration/">.NET Core Global Tools Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/26/Xamarin-Forms-Chat-Bot/">Xamarin Forms Chat Bot</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/26/ECMAScript-vs-TypeScript/">ECMAScript vs TypeScript</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/06/SignalR/">SignalR</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Johan van Rensburg<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

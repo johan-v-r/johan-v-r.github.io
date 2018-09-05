@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Xamarin Forms Chat Bot | JvR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Xamarin Dev Days in Cape Town introduced me to Xamarin Forms, which basically allows you to share C# code accross native Android &amp;amp; iOS apps.   This app was targeted towards speech recognition. Hav">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Xamarin Forms Chat Bot">
+<meta property="og:url" content="https://johan-v-r.github.io/2018/01/26/Xamarin-Forms-Chat-Bot/index.html">
+<meta property="og:site_name" content="JvR">
+<meta property="og:description" content="Xamarin Dev Days in Cape Town introduced me to Xamarin Forms, which basically allows you to share C# code accross native Android &amp;amp; iOS apps.   This app was targeted towards speech recognition. Hav">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-09-05T15:52:14.739Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Xamarin Forms Chat Bot">
+<meta name="twitter:description" content="Xamarin Dev Days in Cape Town introduced me to Xamarin Forms, which basically allows you to share C# code accross native Android &amp;amp; iOS apps.   This app was targeted towards speech recognition. Hav">
+  
+    <link rel="alternate" href="/atom.xml" title="JvR" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">JvR</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Developer; Red Devil; Rock n Roll;</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johan-v-r.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Xamarin-Forms-Chat-Bot" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/26/Xamarin-Forms-Chat-Bot/" class="article-date">
+  <time datetime="2018-01-26T16:11:03.000Z" itemprop="datePublished">2018-01-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Xamarin Forms Chat Bot
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://ti.to/xamarin/dev-days-cape-town-2017" target="_blank" rel="noopener">Xamarin Dev Days in Cape Town</a> introduced me to <a href="https://www.xamarin.com/forms" target="_blank" rel="noopener">Xamarin Forms</a>, which basically allows you to share C# code accross native Android &amp; iOS apps.  </p>
+<p>This app was targeted towards speech recognition. Having my own Android device and coding on Windows, I could really only build and test on Android. However, still worth keeping in mind that eventually this will need to result in an iOS app as well, so all NuGet packages and libraries will have to be usable in both projects.  </p>
+<hr>
+<h2 id="App-Design"><a href="#App-Design" class="headerlink" title="App Design"></a>App Design</h2><p>Getting the hang of which elements are usuable where/when was really difficult at first, but with lots of research online I started getting used to it. Being comfortable with SPA two-way binding frameworks, the <a href="https://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged.aspx" target="_blank" rel="noopener"><code>INotifyPropertyChanged</code></a> implementation seemed very cumbersome on every page for all bindable properties.<br>After some digging I found <a href="https://github.com/Fody/PropertyChanged" target="_blank" rel="noopener">Fody PropertyChanged</a> which did all the heavy lifting for me! It really was as simple as installing the NuGet package, adding a new <code>FodyWeavers.xml</code> file to both iOS &amp; Android projects, then finally just implementing the <code>INotifyPropertyChanged</code> on my VM with its single property:<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MasterViewModel</span> : <span class="title">INotifyPropertyChanged</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">event</span> PropertyChangedEventHandler PropertyChanged;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="Speech-to-Text-amp-Text-to-Speech"><a href="#Speech-to-Text-amp-Text-to-Speech" class="headerlink" title="Speech-to-Text &amp; Text-to-Speech"></a>Speech-to-Text &amp; Text-to-Speech</h2><p>After the pages were ready, next up was the implementation of <em>speech-to-text (stt)</em> and potentially <em>text-to-speech (tts)</em>. Started off by trying some <a href="https://components.xamarin.com/" target="_blank" rel="noopener">Xamarin Forms Components</a> in the hopes to share all its code as well. Some of it worked, but often fell short in certain areas or mobile versions. I think it’s very difficult to keep those components 100% compatible with all platforms, especially with the different OS APIs continuously evolving as well.  </p>
+<p>Keeping the domain logic in the shared project, I needed a way of triggering the native activities and retrieving its results. <a href="https://developer.xamarin.com/guides/xamarin-forms/application-fundamentals/messaging-center/" target="_blank" rel="noopener">Xamarin Messaging Center</a> is a pub/sub service which allows to fire of events without needing to know where it will be executed. This worked well, but eventually became really messy keeping track of multiple subscriptions and difficult to debug at times.  </p>
+<p>The final refactor of this was to remove the messaging center and use the <a href="https://developer.xamarin.com/guides/xamarin-forms/application-fundamentals/dependency-service/" target="_blank" rel="noopener">Xamarin Dependency Service</a>. In order to create a better <em>conversation effect</em> between <em>tts</em> &amp; <em>stt</em> in Android, the events could be queued with the help of Android’s <a href="https://developer.xamarin.com/api/type/Android.Speech.Tts.UtteranceProgressListener/" target="_blank" rel="noopener">Utterance Progress Listener</a>.  </p>
+<hr>
+<h2 id="Dialogflow"><a href="#Dialogflow" class="headerlink" title="Dialogflow"></a><a href="https://dialogflow.com/" target="_blank" rel="noopener">Dialogflow</a></h2><p>Formerly known as API.AI, Dialogflow is a brilliant free artificial intelligence service for converting text into context. You can train your own agent and integrate it with multiple existing systems or, as in this case, with custom applications.  </p>
+<p>There is actually an <a href="https://components.xamarin.com/view/ApiAiSDK" target="_blank" rel="noopener">API.AI Xamarin Component</a> which worked pretty well, but since <a href="https://techcrunch.com/2016/09/19/google-acquires-api-ai-a-company-helping-developers-build-bots-that-arent-awful-to-talk-to/" target="_blank" rel="noopener">Google acquired API.AI</a> and changed it to Dialogflow, a new version for Dialogflow V2 API has been released. At the time of writing (2018/01/26), no <a href="https://dialogflow.com/docs/sdks" target="_blank" rel="noopener">Dialogflow SDKs</a> exist for Xamarin with API V2, which to be fair, is still in BETA.<br>The main difference was the authentication.</p>
+<ul>
+<li>V1 authenticates with an access token</li>
+<li>V2 authenticates with Google</li>
+</ul>
+<p>With the V1 access token you could easily authenticate from the mobile app using the API.AI library. The authentication with V2 requires a bit more configuration. There are various ways to implement the <a href="https://developers.google.com/identity/protocols/OAuth2" target="_blank" rel="noopener">Google OAuth 2.0</a>, however for my purpose I wanted to authenticate to Dialogflow on behalf of the user, NOT using the user’s own credentials. This meant that I had to continue with the <a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount" target="_blank" rel="noopener">OAuth 2.0 Service Account</a> implementation. That involved generating a certificate, so I ended up creating a stand alone Web API.  </p>
+<hr>
+<h2 id="Web-API"><a href="#Web-API" class="headerlink" title="Web API"></a>Web API</h2><p>I went with a lightweight ASPNet Core 2 Web API, which only consisted of 1 endpoint (<code>IntentsController</code>) to facilitate the communication between mobile and Dialogflow.  </p>
+<p>Following the <a href="https://developers.google.com/api-client-library/dotnet/guide/aaa_oauth#service-account" target="_blank" rel="noopener">Google service account .Net OAuth 2.0</a>  guide, the implementation was pretty straight forward.  </p>
+<p>In order to communicate with this API, I created a new <code>.Net Standard 2.0</code> project that utilized the basic <a href="https://msdn.microsoft.com/en-us/library/system.net.http.httpclient(v=vs.118" target="_blank" rel="noopener">.Net HttpClient</a>.aspx). It didn’t have to be in a new project, but I thought it best for reusability &amp; testability, and also a small awesome experiment to see how easy it was to reference my own .Net Standard project. Turns out it was straight forward as expected, and everything just worked together nicely.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johan-v-r.github.io/2018/01/26/Xamarin-Forms-Chat-Bot/" data-id="cjlpbuxcs0003ach1okq4j53v" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/09/05/NET-Core-Global-Tools-Configuration/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          .NET Core Global Tools Configuration
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/26/ECMAScript-vs-TypeScript/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ECMAScript vs TypeScript</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/05/NET-Core-Global-Tools-Configuration/">.NET Core Global Tools Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/26/Xamarin-Forms-Chat-Bot/">Xamarin Forms Chat Bot</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/26/ECMAScript-vs-TypeScript/">ECMAScript vs TypeScript</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/06/SignalR/">SignalR</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Johan van Rensburg<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

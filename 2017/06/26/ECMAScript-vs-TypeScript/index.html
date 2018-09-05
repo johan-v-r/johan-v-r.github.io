@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>ECMAScript vs TypeScript | JvR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="I was tasked recently to investigate a tech upgrade, for an existing system that started about 5 years ago.That included various aspects of the system, however I will only be focusing on the language">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ECMAScript vs TypeScript">
+<meta property="og:url" content="https://johan-v-r.github.io/2017/06/26/ECMAScript-vs-TypeScript/index.html">
+<meta property="og:site_name" content="JvR">
+<meta property="og:description" content="I was tasked recently to investigate a tech upgrade, for an existing system that started about 5 years ago.That included various aspects of the system, however I will only be focusing on the language">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-09-05T15:52:14.735Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ECMAScript vs TypeScript">
+<meta name="twitter:description" content="I was tasked recently to investigate a tech upgrade, for an existing system that started about 5 years ago.That included various aspects of the system, however I will only be focusing on the language">
+  
+    <link rel="alternate" href="/atom.xml" title="JvR" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">JvR</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Developer; Red Devil; Rock n Roll;</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johan-v-r.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-ECMAScript-vs-TypeScript" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/26/ECMAScript-vs-TypeScript/" class="article-date">
+  <time datetime="2017-06-26T21:00:36.000Z" itemprop="datePublished">2017-06-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ECMAScript vs TypeScript
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>I was tasked recently to investigate a tech upgrade, for an existing system that started about 5 years ago.<br>That included various aspects of the system, however I will only be focusing on the language investigation for the purpose of this post.</p>
+<h2 id="App-initial-notes"><a href="#App-initial-notes" class="headerlink" title="App initial notes:"></a>App initial notes:</h2><ul>
+<li>It was one of the company’s first SPAs</li>
+<li>Written in TypeScript <em>version-very-old</em></li>
+<li>All the devs code in Visual Studio (server side as well) for Windows</li>
+</ul>
+<p>Keep in mind that I don’t know much of this system’s critical domain. Also I have worked on a fair spread of apps using TypeScript / ECMAScript 2015 / good ‘ol JavaScript (ES5). So hopefully that counts in my favour of having an unbiased opinion, initially, at least…</p>
+<h2 id="New-scaffold"><a href="#New-scaffold" class="headerlink" title="New scaffold"></a>New scaffold</h2><p>After deciding on the framework, I set of to start a new app full of piss and vinegar.<br>Almost immediately I was faced with the question: <em>ES2015 or TypeScript ?</em></p>
+<p>No problem, let’s go with the current app’s language and stick with TypeScript. After all that should make our lives somewhat easier by just copying the current files and leaving their format as <code>*.ts</code>. Sure we still have to adapt some of the actual code later on, but for now let’s just get it to transpile.  </p>
+<p>Now if you have ever tried to upgrade any application’s framework / runtime engine / target platform, which is ~ 5 years out of date, you will know this is never just a simple flip of the switch. The rabbit holes are deep and dark, but eventually you might find some light at the end of that tunnel.  I was then left with a couple of broken / commented out references to be included.</p>
+<h2 id="3rd-Party-Libraries"><a href="#3rd-Party-Libraries" class="headerlink" title="3rd Party Libraries"></a>3rd Party Libraries</h2><p>Right, scaffold complete. Next up: include some packages.<br>Almost all applications and packages has some dependencies on other libraries, and should really use some kind of package manager or CDN today. This however, was not commonly used or available a few years back, with most packages simply checked in with their source control.</p>
+<p>We have since come a long way with the help of Node &amp; <a href="https://www.npmjs.com/" target="_blank" rel="noopener">npm</a>, and I was going to take full advantage of that.<br>On previous projects I have used <a href="https://github.com/DefinitelyTyped/tsd" target="_blank" rel="noopener">tsd</a>, which now had a big warning: <strong>DEPRECATED: TSD is deprecated, please use <a href="https://github.com/typings/typings" target="_blank" rel="noopener">Typings</a></strong>. It was never my favourite package manager, with a lot of packages missing or often out-of-date definition files, so no tears shed.  </p>
+<p>Fair enough, on to <a href="https://github.com/typings/typings" target="_blank" rel="noopener">Typings</a> it is then. However this <strong><em>also</em></strong> has a deprecation notice regarding <a href="mailto:TypeScript@2.0" target="_blank" rel="noopener">TypeScript@2.0</a> and stating: <em>…some definitions on DefinitelyTyped may not work with the Typings approach because of new TypeScript features…</em>. Red flags raised.  </p>
+<h2 id="ECMAScript-2015-Prototype"><a href="#ECMAScript-2015-Prototype" class="headerlink" title="ECMAScript 2015 Prototype"></a>ECMAScript 2015 Prototype</h2><p>At this point I was exhausted and thought about possibly converting over to ES2015 JavaScript. The syntax is mostly the same and you get most of the benefits as you would in TypeScript with the tools available today. Obviously you lose the strict typing (except for types declared with <code>any</code> which this project had plentiful), but then you also gain the dynamic flexibility (which I personally really like).  </p>
+<p>As a prototype, I updated the scaffold for ES2015 and used the <a href="https://babeljs.io/" target="_blank" rel="noopener">Babel transpiler</a>. After a quick copy-paste &amp; minimal find-replace, the code was actually compiling. Not running yet, just successfully transpiled. Progress at last.  </p>
+<p><strong>Package manager round 2:</strong> simple. <code>npm install</code> those bad-boys, configure some modules, and it was done. A working upgraded example we can immediately continue working on, but would this actually be acceptable for the team?<br>Initially during the demo, some team-members didn’t even notice the language change. Most seemed unfazed with this change, others actually excited, and a couple understandably concerned.</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Eventually the move to ES2015 was accepted and embraced by the team. With the preferred editor now being VS Code, some can even do away with full Visual Studio and Windows if they prefer. They already have the knowledge to continue with the proper ECMAScript standards, and existing good procedures (PR &amp; QA) in place.  </p>
+<p>Debugging TypeScript has always been another massive pain. For an established existing application, it’s preferred to have browser debugging available when having to make domain functionality changes. In the end, ease and practicality outweighed the benefit of type-safety.  </p>
+<p>Having a look at the <a href="http://kangax.github.io/compat-table/es6/" target="_blank" rel="noopener">ECMAScript 2015 Compatibility Table</a>, we could probably start doing away with ES5 completely in the near future. Deprecated package managers and incompatible Typings features, causing builds to fail and multiple headaches, could be the start of TypeScript’s death.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johan-v-r.github.io/2017/06/26/ECMAScript-vs-TypeScript/" data-id="cjlpbuxce0000ach18gnrak46" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/26/Xamarin-Forms-Chat-Bot/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Xamarin Forms Chat Bot
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/06/SignalR/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">SignalR</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/05/NET-Core-Global-Tools-Configuration/">.NET Core Global Tools Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/26/Xamarin-Forms-Chat-Bot/">Xamarin Forms Chat Bot</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/26/ECMAScript-vs-TypeScript/">ECMAScript vs TypeScript</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/06/SignalR/">SignalR</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Johan van Rensburg<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>SignalR | JvR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="SignalR On OWIN &amp;amp; JavaScriptThe purpose of this post is to show the different SignalR implementations available for an OWIN WebApi &amp;amp; JavaScript.  OWIN WebApiNuGet Packages used:  Microsoft.Owi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SignalR">
+<meta property="og:url" content="https://johan-v-r.github.io/2017/06/06/SignalR/index.html">
+<meta property="og:site_name" content="JvR">
+<meta property="og:description" content="SignalR On OWIN &amp;amp; JavaScriptThe purpose of this post is to show the different SignalR implementations available for an OWIN WebApi &amp;amp; JavaScript.  OWIN WebApiNuGet Packages used:  Microsoft.Owi">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-09-05T15:52:14.738Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SignalR">
+<meta name="twitter:description" content="SignalR On OWIN &amp;amp; JavaScriptThe purpose of this post is to show the different SignalR implementations available for an OWIN WebApi &amp;amp; JavaScript.  OWIN WebApiNuGet Packages used:  Microsoft.Owi">
+  
+    <link rel="alternate" href="/atom.xml" title="JvR" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">JvR</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Developer; Red Devil; Rock n Roll;</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johan-v-r.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-SignalR" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/06/SignalR/" class="article-date">
+  <time datetime="2017-06-06T20:31:14.000Z" itemprop="datePublished">2017-06-06</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      SignalR
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="SignalR-On-OWIN-amp-JavaScript"><a href="#SignalR-On-OWIN-amp-JavaScript" class="headerlink" title="SignalR On OWIN &amp; JavaScript"></a>SignalR On OWIN &amp; JavaScript</h2><p>The purpose of this post is to show the different SignalR implementations available for an OWIN WebApi &amp; JavaScript.</p>
+<hr>
+<h2 id="OWIN-WebApi"><a href="#OWIN-WebApi" class="headerlink" title="OWIN WebApi"></a>OWIN WebApi</h2><p>NuGet Packages used:</p>
+<ul>
+<li>Microsoft.Owin.SelfHost</li>
+<li>Microsoft.AspNet.SignalR.SelfHost</li>
+<li>And all related dependencies</li>
+</ul>
+<p>To get started, follow the tutorial <a href="http://www.asp.net/signalr/overview/deployment/tutorial-signalr-self-host" target="_blank" rel="noopener">here</a></p>
+<p>In the Startup class, where the OWIN configuration is set, we must include the SignalR configuration to run in the same pipeline.</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configuration</span>(<span class="params">IAppBuilder app</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">var</span> httpConfiguration = SetupHttpConfiguration();</span><br><span class="line">  app.UseWebApi(httpConfiguration);</span><br><span class="line"></span><br><span class="line">  app.Map(<span class="string">"/signalr"</span>, map =&gt;</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">// Setup the cors middleware to run before SignalR.</span></span><br><span class="line">    <span class="comment">// By default this will allow all origins. You can </span></span><br><span class="line">    <span class="comment">// configure the set of origins and/or http verbs by</span></span><br><span class="line">    <span class="comment">// providing a cors options with a different policy.</span></span><br><span class="line">    map.UseCors(CorsOptions.AllowAll);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> hubConfiguration = <span class="keyword">new</span> HubConfiguration</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// You can enable JSONP by uncommenting line below.</span></span><br><span class="line">      <span class="comment">// JSONP requests are insecure but some older browsers (and some</span></span><br><span class="line">      <span class="comment">// versions of IE) require JSONP to work cross domain</span></span><br><span class="line">      <span class="comment">// EnableJSONP = true</span></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Run the SignalR pipeline. We're not using MapSignalR</span></span><br><span class="line">    <span class="comment">// since this branch already runs under the "/signalr" path.</span></span><br><span class="line">    map.RunSignalR(hubConfiguration);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The following 2 hubs purely to show the difference of how they will be used in the front-end.</p>
+<ul>
+<li><h4 id="Generated-Proxy-Hub"><a href="#Generated-Proxy-Hub" class="headerlink" title="Generated Proxy Hub"></a>Generated Proxy Hub</h4><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">GeneratedProxyHub</span> : <span class="title">Hub</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">// http://stackoverflow.com/questions/31169509/signalr-how-to-truly-call-a-hubs-method-from-the-server-c-sharp</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> IHubContext context = GlobalHost.ConnectionManager.GetHubContext&lt;GeneratedProxyHub&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> Task <span class="title">OnConnected</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> qs = Context.QueryString[<span class="string">"user"</span>];</span><br><span class="line">    Send(<span class="string">"GeneratedProxyHub"</span>, qs);    </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">base</span>.OnConnected();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Send</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">string</span> message</span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    Clients.All.addMessage(name, <span class="string">"Generated Proxy Hub: "</span> + message);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Push</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">string</span> message</span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    context.Clients.All.addMessage(name, <span class="string">"Generated Proxy Hub: "</span> + message);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>There is nothing special in the setup between them, except for the <code>IHubContext</code> in the <a href="#Generated-Proxy-Hub">Generated Proxy Hub (above)</a>. That is only used when calling <code>Push()</code> from a controller <a href="#SignalR-access-from-ApiController">as explained later</a>. So the <code>IHubContext</code> can be removed safely without breaking the normal functionality.</p>
+<ul>
+<li><h4 id="Manual-Proxy-Hub"><a href="#Manual-Proxy-Hub" class="headerlink" title="Manual Proxy Hub"></a>Manual Proxy Hub</h4><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ManualProxyHub</span> : <span class="title">Hub</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> Task <span class="title">OnConnected</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> qs = Context.QueryString[<span class="string">"manualProxyUser"</span>];</span><br><span class="line">    ManualProxySend(<span class="string">"ManualProxyHub"</span>, qs);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">base</span>.OnConnected();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ManualProxySend</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">string</span> message</span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    Clients.All.addManualMessage(name, <span class="string">"Manual Proxy Hub: "</span> +  message);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ManualProxyPush</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">string</span> message</span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    Clients.All.addManualMessage(name, <span class="string">"Manual Proxy Hub: "</span> + message);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h2 id="Front-End"><a href="#Front-End" class="headerlink" title="Front-End"></a>Front-End</h2><p>The 2 front-end implementations are: (best explained <a href="http://www.asp.net/signalr/overview/guide-to-the-api/hubs-api-guide-javascript-client" target="_blank" rel="noopener">here</a>)</p>
+<ul>
+<li>Generated Proxy</li>
+<li>Manual Proxy (without generated proxy)</li>
+</ul>
+<p>The major difference being:</p>
+<ul>
+<li><p><em>Generated Proxy:</em> Gets the hub’s context in a <code>.js</code> script generated by the SignalR WebApi on page load via <code>&lt;script&gt;</code> tags from the <code>index.html</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">"bower_components/signalr/jquery.signalR.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line">&lt;script src=<span class="string">"http://localhost:9000/signalr/hubs"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>  Usage:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> generatedProxy = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// By default, the hub location is the current server</span></span><br><span class="line">  <span class="comment">// if you are connecting to a different server, specify the URL before calling the start method, </span></span><br><span class="line">  $.connection.hub.url = <span class="string">"http://localhost:9000/signalr"</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// Declare a proxy to reference the hub.</span></span><br><span class="line">  <span class="keyword">var</span> generatedProxyHub = $.connection.generatedProxyHub;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create a function that the hub can call to broadcast messages.</span></span><br><span class="line">  generatedProxyHub.client.addMessage = <span class="function"><span class="keyword">function</span> (<span class="params">name, message</span>) </span>&#123;</span><br><span class="line">    addMessage(name, message);</span><br><span class="line">  &#125;;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// add querystring to send data to server on connect</span></span><br><span class="line">  $.connection.hub.qs = &#123; <span class="string">'user'</span> : username &#125;;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// Start the connection.</span></span><br><span class="line">  $.connection.hub.start().done(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    $(<span class="string">'#sendmessage'</span>).click(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">// Call the Send method on the hub.</span></span><br><span class="line">      generatedProxyHub.server.send($(<span class="string">'#displayname'</span>).val(), $(<span class="string">'#message'</span>).val());</span><br><span class="line">      <span class="comment">// Clear text box and reset focus for next comment.</span></span><br><span class="line">      $(<span class="string">'#message'</span>).val(<span class="string">''</span>).focus();</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><em>Manual Proxy:</em> Only accessing the hubs when needed. Notice the custom <code>createHubProxy(&quot;ManualProxyHub&quot;)</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> manualProxy = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// declare connection and proxy to communicate with the hub</span></span><br><span class="line">  <span class="keyword">var</span> hubConnection = $.hubConnection(<span class="string">"http://localhost:9000/signalr"</span>);</span><br><span class="line">  <span class="keyword">var</span> hubProxy = hubConnection.createHubProxy(<span class="string">"ManualProxyHub"</span>);</span><br><span class="line">  </span><br><span class="line">  hubProxy.on(<span class="string">"addManualMessage"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">name, message</span>) </span>&#123;</span><br><span class="line">    addMessage(name, message);</span><br><span class="line">  &#125;);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// add querystring to send data to server on connect</span></span><br><span class="line">  hubConnection.qs = &#123; <span class="string">'manualProxyUser'</span> : username &#125;;</span><br><span class="line">  </span><br><span class="line">  hubConnection.start().done(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    $(<span class="string">'#sendManualProxyMessage'</span>).click(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">// Call the Push method on the manual proxy hub.</span></span><br><span class="line">      hubProxy.invoke(<span class="string">'ManualProxyPush'</span>, $(<span class="string">'#displayname'</span>).val(), $(<span class="string">'#message'</span>).val());</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// Clear text box and reset focus for next comment.</span></span><br><span class="line">      $(<span class="string">'#message'</span>).val(<span class="string">''</span>).focus();</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>Other small differences include dynamic function calls vs event binding and invoking methods.</p>
+<h2 id="SignalR-access-from-ApiController"><a href="#SignalR-access-from-ApiController" class="headerlink" title="SignalR access from ApiController"></a>SignalR access from ApiController</h2><p>As requests to an ApiController has a HTTP Context, we need to get the context for the Hub’s WebSocket protocol.</p>
+<p>For ease of use I have created a static IHubContext in the <a href="#Generated-Proxy-Hub">Generated Proxy Hub (above)</a> which can be used when calling the Hub’s methods from the controllers, as seen <a href="https://stackoverflow.com/a/31063193/5954805" target="_blank" rel="noopener">here</a>.</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TestController</span> : <span class="title">ApiController</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">string</span> <span class="title">Get</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    GeneratedProxyHub.Push(<span class="string">"WebApi"</span>, <span class="string">"Hello World!"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Result sent to request and connected SignalR hub clients"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Resources"><a href="#Resources" class="headerlink" title="Resources"></a>Resources</h3><p>Demo Source Code: <a href="https://github.com/johan-v-r/SignalR" target="_blank" rel="noopener">https://github.com/johan-v-r/SignalR</a></p>
+<p><a href="http://www.asp.net/signalr/overview/deployment/tutorial-signalr-self-host" target="_blank" rel="noopener">http://www.asp.net/signalr/overview/deployment/tutorial-signalr-self-host</a></p>
+<p><a href="http://www.asp.net/signalr/overview/guide-to-the-api/hubs-api-guide-javascript-client" target="_blank" rel="noopener">http://www.asp.net/signalr/overview/guide-to-the-api/hubs-api-guide-javascript-client</a></p>
+<p><a href="http://stackoverflow.com/questions/31169509/signalr-how-to-truly-call-a-hubs-method-from-the-server-c-sharp" target="_blank" rel="noopener">http://stackoverflow.com/questions/31169509/signalr-how-to-truly-call-a-hubs-method-from-the-server-c-sharp</a></p>
+<p><a href="https://stackoverflow.com/a/31063193/5954805" target="_blank" rel="noopener">https://stackoverflow.com/a/31063193/5954805</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johan-v-r.github.io/2017/06/06/SignalR/" data-id="cjlpbuxcr0002ach15yr8su2x" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/06/26/ECMAScript-vs-TypeScript/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          ECMAScript vs TypeScript
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/05/NET-Core-Global-Tools-Configuration/">.NET Core Global Tools Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/26/Xamarin-Forms-Chat-Bot/">Xamarin Forms Chat Bot</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/26/ECMAScript-vs-TypeScript/">ECMAScript vs TypeScript</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/06/SignalR/">SignalR</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Johan van Rensburg<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

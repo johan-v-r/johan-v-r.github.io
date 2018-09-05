@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>JvR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="JvR">
+<meta property="og:url" content="https://johan-v-r.github.io/index.html">
+<meta property="og:site_name" content="JvR">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JvR">
+  
+    <link rel="alternate" href="/atom.xml" title="JvR" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">JvR</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Developer; Red Devil; Rock n Roll;</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://johan-v-r.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-NET-Core-Global-Tools-Configuration" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/05/NET-Core-Global-Tools-Configuration/" class="article-date">
+  <time datetime="2018-09-05T15:16:55.000Z" itemprop="datePublished">2018-09-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/05/NET-Core-Global-Tools-Configuration/">.NET Core Global Tools Configuration</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="TL-DR"><a href="#TL-DR" class="headerlink" title="TL;DR:"></a>TL;DR:</h2><p><a href="https://natemcmaster.com/blog/2018/05/12/dotnet-global-tools/" target="_blank" rel="noopener">Nate McMaster’s post</a> provides a really nice and detailed explanation on how to configure your <code>csproj</code> to build your app as a tool.  </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">PackAsTool</span>&gt;</span>true<span class="tag">&lt;/<span class="name">PackAsTool</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">OutputType</span>&gt;</span>Exe<span class="tag">&lt;/<span class="name">OutputType</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFramework</span>&gt;</span>netcoreapp2.1<span class="tag">&lt;/<span class="name">TargetFramework</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Build with <code>dotnet pack</code> (creates NuGet package to be published)  </p>
+<blockquote>
+<p>Nice to test by setting up your own <a href="https://docs.microsoft.com/en-us/nuget/hosting-packages/nuget-server" target="_blank" rel="noopener">NuGet.Server</a></p>
+</blockquote>
+<hr>
+<h2 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h2><p>The above is quite simple and works as expected. However, some projects might require more configuration.  </p>
+<p>I wanted to package an existing console app as a .NET global tool, whilst still keeping the current console apps (multi-target) capabilities. So my original configuration was the standard multi-target specification:  </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFrameworks</span>&gt;</span>netcoreapp2.1;net472<span class="tag">&lt;/<span class="name">TargetFrameworks</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>After adding the <code>&lt;PackAsTool&gt;true&lt;/PackAsTool&gt;</code> to this configuration the NuGet package failed to build, stating that <em>…Microsoft.NET.PackTool.targets(32,5): error NETSDK1054: only supports .NET Core…</em>  </p>
+<p>I really didn’t want to create a new project, so I eventually got the NuGet package building by splitting out the <code>PackAsTool</code> into a specific .NET Core 2.1 <code>PropertyGroup</code>:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFrameworks</span>&gt;</span>netcoreapp2.1;net472<span class="tag">&lt;/<span class="name">TargetFrameworks</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span> <span class="attr">Condition</span>=<span class="string">"'$(TargetFramework)' == 'netcoreapp2.1'"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">PackAsTool</span>&gt;</span>true<span class="tag">&lt;/<span class="name">PackAsTool</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>The package now contained the console in their respective framework’s <code>lib</code> folder, as well as the <code>netcoreapp2.1</code> in the <code>tools</code> folder. This package was hosted successfully, but <strong>could NOT be installed</strong>.  </p>
+<p>The final result was to build separate NuGet packages. This also meant giving them different names. So I just used a random made-up condition (<code>GlobalTool</code>) and kept the original <code>PropertyGroup</code> with its default name, and specifying my tool with an explicit <code>netcoreapp.1</code> framework a new <code>PackageId</code>:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span> <span class="attr">Condition</span>=<span class="string">"'$(GlobalTool)' != true"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFrameworks</span>&gt;</span>netcoreapp2.1;net472<span class="tag">&lt;/<span class="name">TargetFrameworks</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">PropertyGroup</span> <span class="attr">Condition</span>=<span class="string">"'$(GlobalTool)' == true"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">PackAsTool</span>&gt;</span>true<span class="tag">&lt;/<span class="name">PackAsTool</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">TargetFramework</span>&gt;</span>netcoreapp2.1<span class="tag">&lt;/<span class="name">TargetFramework</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">PackageId</span>&gt;</span>Foo-Tool<span class="tag">&lt;/<span class="name">PackageId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>Note the use of <code>Condition=&quot;&#39;$(GlobalTool)&#39; != true&quot;</code> instead of <code>Condition=&quot;&#39;$(GlobalTool)&#39; == false&quot;</code> made my default build &amp; pack use that <code>PropertyGroup</code>.  </p>
+</blockquote>
+<p>It’s also possible to add (override) any other <a href="https://docs.microsoft.com/en-us/dotnet/core/tools/csproj#nuget-metadata-properties" target="_blank" rel="noopener">NuGet metadata properties</a> (i.e. Description) in these sections.</p>
+<p>Now my pack process looks like this:  </p>
+<pre><code>dotnet pack  
+dotnet pack /p:GlobalTool=true
+</code></pre><p>This results in 2 NuGet packages, which are both uploaded and can be installed independently. You can then install the global tool with <code>dotnet tool install -g foo-tool</code> </p>
+<p> Because the <a href="https://natemcmaster.com/blog/2018/05/12/dotnet-global-tools/#package-authoring-and-sdk" target="_blank" rel="noopener"><code>ToolCommandName</code></a> defaults to the name of the assembly name, you are still able to use it with <code>foo</code>.  </p>
+<hr>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p> I was pleasantly surprised with the flexibility of the <code>csproj</code> configuration. Making this possible took some digging and experimentation, but good exercise to step outside of the standard tooling.  </p>
+<p> It’s still very early for the .NET Core global tools, but still awesome and can see this being widely adopted soon.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johan-v-r.github.io/2018/09/05/NET-Core-Global-Tools-Configuration/" data-id="cjlpbuxcl0001ach1ecbk63zw" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Xamarin-Forms-Chat-Bot" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/26/Xamarin-Forms-Chat-Bot/" class="article-date">
+  <time datetime="2018-01-26T16:11:03.000Z" itemprop="datePublished">2018-01-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/26/Xamarin-Forms-Chat-Bot/">Xamarin Forms Chat Bot</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://ti.to/xamarin/dev-days-cape-town-2017" target="_blank" rel="noopener">Xamarin Dev Days in Cape Town</a> introduced me to <a href="https://www.xamarin.com/forms" target="_blank" rel="noopener">Xamarin Forms</a>, which basically allows you to share C# code accross native Android &amp; iOS apps.  </p>
+<p>This app was targeted towards speech recognition. Having my own Android device and coding on Windows, I could really only build and test on Android. However, still worth keeping in mind that eventually this will need to result in an iOS app as well, so all NuGet packages and libraries will have to be usable in both projects.  </p>
+<hr>
+<h2 id="App-Design"><a href="#App-Design" class="headerlink" title="App Design"></a>App Design</h2><p>Getting the hang of which elements are usuable where/when was really difficult at first, but with lots of research online I started getting used to it. Being comfortable with SPA two-way binding frameworks, the <a href="https://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged.aspx" target="_blank" rel="noopener"><code>INotifyPropertyChanged</code></a> implementation seemed very cumbersome on every page for all bindable properties.<br>After some digging I found <a href="https://github.com/Fody/PropertyChanged" target="_blank" rel="noopener">Fody PropertyChanged</a> which did all the heavy lifting for me! It really was as simple as installing the NuGet package, adding a new <code>FodyWeavers.xml</code> file to both iOS &amp; Android projects, then finally just implementing the <code>INotifyPropertyChanged</code> on my VM with its single property:<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MasterViewModel</span> : <span class="title">INotifyPropertyChanged</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">event</span> PropertyChangedEventHandler PropertyChanged;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="Speech-to-Text-amp-Text-to-Speech"><a href="#Speech-to-Text-amp-Text-to-Speech" class="headerlink" title="Speech-to-Text &amp; Text-to-Speech"></a>Speech-to-Text &amp; Text-to-Speech</h2><p>After the pages were ready, next up was the implementation of <em>speech-to-text (stt)</em> and potentially <em>text-to-speech (tts)</em>. Started off by trying some <a href="https://components.xamarin.com/" target="_blank" rel="noopener">Xamarin Forms Components</a> in the hopes to share all its code as well. Some of it worked, but often fell short in certain areas or mobile versions. I think it’s very difficult to keep those components 100% compatible with all platforms, especially with the different OS APIs continuously evolving as well.  </p>
+<p>Keeping the domain logic in the shared project, I needed a way of triggering the native activities and retrieving its results. <a href="https://developer.xamarin.com/guides/xamarin-forms/application-fundamentals/messaging-center/" target="_blank" rel="noopener">Xamarin Messaging Center</a> is a pub/sub service which allows to fire of events without needing to know where it will be executed. This worked well, but eventually became really messy keeping track of multiple subscriptions and difficult to debug at times.  </p>
+<p>The final refactor of this was to remove the messaging center and use the <a href="https://developer.xamarin.com/guides/xamarin-forms/application-fundamentals/dependency-service/" target="_blank" rel="noopener">Xamarin Dependency Service</a>. In order to create a better <em>conversation effect</em> between <em>tts</em> &amp; <em>stt</em> in Android, the events could be queued with the help of Android’s <a href="https://developer.xamarin.com/api/type/Android.Speech.Tts.UtteranceProgressListener/" target="_blank" rel="noopener">Utterance Progress Listener</a>.  </p>
+<hr>
+<h2 id="Dialogflow"><a href="#Dialogflow" class="headerlink" title="Dialogflow"></a><a href="https://dialogflow.com/" target="_blank" rel="noopener">Dialogflow</a></h2><p>Formerly known as API.AI, Dialogflow is a brilliant free artificial intelligence service for converting text into context. You can train your own agent and integrate it with multiple existing systems or, as in this case, with custom applications.  </p>
+<p>There is actually an <a href="https://components.xamarin.com/view/ApiAiSDK" target="_blank" rel="noopener">API.AI Xamarin Component</a> which worked pretty well, but since <a href="https://techcrunch.com/2016/09/19/google-acquires-api-ai-a-company-helping-developers-build-bots-that-arent-awful-to-talk-to/" target="_blank" rel="noopener">Google acquired API.AI</a> and changed it to Dialogflow, a new version for Dialogflow V2 API has been released. At the time of writing (2018/01/26), no <a href="https://dialogflow.com/docs/sdks" target="_blank" rel="noopener">Dialogflow SDKs</a> exist for Xamarin with API V2, which to be fair, is still in BETA.<br>The main difference was the authentication.</p>
+<ul>
+<li>V1 authenticates with an access token</li>
+<li>V2 authenticates with Google</li>
+</ul>
+<p>With the V1 access token you could easily authenticate from the mobile app using the API.AI library. The authentication with V2 requires a bit more configuration. There are various ways to implement the <a href="https://developers.google.com/identity/protocols/OAuth2" target="_blank" rel="noopener">Google OAuth 2.0</a>, however for my purpose I wanted to authenticate to Dialogflow on behalf of the user, NOT using the user’s own credentials. This meant that I had to continue with the <a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount" target="_blank" rel="noopener">OAuth 2.0 Service Account</a> implementation. That involved generating a certificate, so I ended up creating a stand alone Web API.  </p>
+<hr>
+<h2 id="Web-API"><a href="#Web-API" class="headerlink" title="Web API"></a>Web API</h2><p>I went with a lightweight ASPNet Core 2 Web API, which only consisted of 1 endpoint (<code>IntentsController</code>) to facilitate the communication between mobile and Dialogflow.  </p>
+<p>Following the <a href="https://developers.google.com/api-client-library/dotnet/guide/aaa_oauth#service-account" target="_blank" rel="noopener">Google service account .Net OAuth 2.0</a>  guide, the implementation was pretty straight forward.  </p>
+<p>In order to communicate with this API, I created a new <code>.Net Standard 2.0</code> project that utilized the basic <a href="https://msdn.microsoft.com/en-us/library/system.net.http.httpclient(v=vs.118" target="_blank" rel="noopener">.Net HttpClient</a>.aspx). It didn’t have to be in a new project, but I thought it best for reusability &amp; testability, and also a small awesome experiment to see how easy it was to reference my own .Net Standard project. Turns out it was straight forward as expected, and everything just worked together nicely.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johan-v-r.github.io/2018/01/26/Xamarin-Forms-Chat-Bot/" data-id="cjlpbuxcs0003ach1okq4j53v" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-ECMAScript-vs-TypeScript" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/26/ECMAScript-vs-TypeScript/" class="article-date">
+  <time datetime="2017-06-26T21:00:36.000Z" itemprop="datePublished">2017-06-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/26/ECMAScript-vs-TypeScript/">ECMAScript vs TypeScript</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>I was tasked recently to investigate a tech upgrade, for an existing system that started about 5 years ago.<br>That included various aspects of the system, however I will only be focusing on the language investigation for the purpose of this post.</p>
+<h2 id="App-initial-notes"><a href="#App-initial-notes" class="headerlink" title="App initial notes:"></a>App initial notes:</h2><ul>
+<li>It was one of the company’s first SPAs</li>
+<li>Written in TypeScript <em>version-very-old</em></li>
+<li>All the devs code in Visual Studio (server side as well) for Windows</li>
+</ul>
+<p>Keep in mind that I don’t know much of this system’s critical domain. Also I have worked on a fair spread of apps using TypeScript / ECMAScript 2015 / good ‘ol JavaScript (ES5). So hopefully that counts in my favour of having an unbiased opinion, initially, at least…</p>
+<h2 id="New-scaffold"><a href="#New-scaffold" class="headerlink" title="New scaffold"></a>New scaffold</h2><p>After deciding on the framework, I set of to start a new app full of piss and vinegar.<br>Almost immediately I was faced with the question: <em>ES2015 or TypeScript ?</em></p>
+<p>No problem, let’s go with the current app’s language and stick with TypeScript. After all that should make our lives somewhat easier by just copying the current files and leaving their format as <code>*.ts</code>. Sure we still have to adapt some of the actual code later on, but for now let’s just get it to transpile.  </p>
+<p>Now if you have ever tried to upgrade any application’s framework / runtime engine / target platform, which is ~ 5 years out of date, you will know this is never just a simple flip of the switch. The rabbit holes are deep and dark, but eventually you might find some light at the end of that tunnel.  I was then left with a couple of broken / commented out references to be included.</p>
+<h2 id="3rd-Party-Libraries"><a href="#3rd-Party-Libraries" class="headerlink" title="3rd Party Libraries"></a>3rd Party Libraries</h2><p>Right, scaffold complete. Next up: include some packages.<br>Almost all applications and packages has some dependencies on other libraries, and should really use some kind of package manager or CDN today. This however, was not commonly used or available a few years back, with most packages simply checked in with their source control.</p>
+<p>We have since come a long way with the help of Node &amp; <a href="https://www.npmjs.com/" target="_blank" rel="noopener">npm</a>, and I was going to take full advantage of that.<br>On previous projects I have used <a href="https://github.com/DefinitelyTyped/tsd" target="_blank" rel="noopener">tsd</a>, which now had a big warning: <strong>DEPRECATED: TSD is deprecated, please use <a href="https://github.com/typings/typings" target="_blank" rel="noopener">Typings</a></strong>. It was never my favourite package manager, with a lot of packages missing or often out-of-date definition files, so no tears shed.  </p>
+<p>Fair enough, on to <a href="https://github.com/typings/typings" target="_blank" rel="noopener">Typings</a> it is then. However this <strong><em>also</em></strong> has a deprecation notice regarding <a href="mailto:TypeScript@2.0" target="_blank" rel="noopener">TypeScript@2.0</a> and stating: <em>…some definitions on DefinitelyTyped may not work with the Typings approach because of new TypeScript features…</em>. Red flags raised.  </p>
+<h2 id="ECMAScript-2015-Prototype"><a href="#ECMAScript-2015-Prototype" class="headerlink" title="ECMAScript 2015 Prototype"></a>ECMAScript 2015 Prototype</h2><p>At this point I was exhausted and thought about possibly converting over to ES2015 JavaScript. The syntax is mostly the same and you get most of the benefits as you would in TypeScript with the tools available today. Obviously you lose the strict typing (except for types declared with <code>any</code> which this project had plentiful), but then you also gain the dynamic flexibility (which I personally really like).  </p>
+<p>As a prototype, I updated the scaffold for ES2015 and used the <a href="https://babeljs.io/" target="_blank" rel="noopener">Babel transpiler</a>. After a quick copy-paste &amp; minimal find-replace, the code was actually compiling. Not running yet, just successfully transpiled. Progress at last.  </p>
+<p><strong>Package manager round 2:</strong> simple. <code>npm install</code> those bad-boys, configure some modules, and it was done. A working upgraded example we can immediately continue working on, but would this actually be acceptable for the team?<br>Initially during the demo, some team-members didn’t even notice the language change. Most seemed unfazed with this change, others actually excited, and a couple understandably concerned.</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Eventually the move to ES2015 was accepted and embraced by the team. With the preferred editor now being VS Code, some can even do away with full Visual Studio and Windows if they prefer. They already have the knowledge to continue with the proper ECMAScript standards, and existing good procedures (PR &amp; QA) in place.  </p>
+<p>Debugging TypeScript has always been another massive pain. For an established existing application, it’s preferred to have browser debugging available when having to make domain functionality changes. In the end, ease and practicality outweighed the benefit of type-safety.  </p>
+<p>Having a look at the <a href="http://kangax.github.io/compat-table/es6/" target="_blank" rel="noopener">ECMAScript 2015 Compatibility Table</a>, we could probably start doing away with ES5 completely in the near future. Deprecated package managers and incompatible Typings features, causing builds to fail and multiple headaches, could be the start of TypeScript’s death.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johan-v-r.github.io/2017/06/26/ECMAScript-vs-TypeScript/" data-id="cjlpbuxce0000ach18gnrak46" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-SignalR" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/06/SignalR/" class="article-date">
+  <time datetime="2017-06-06T20:31:14.000Z" itemprop="datePublished">2017-06-06</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/06/SignalR/">SignalR</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="SignalR-On-OWIN-amp-JavaScript"><a href="#SignalR-On-OWIN-amp-JavaScript" class="headerlink" title="SignalR On OWIN &amp; JavaScript"></a>SignalR On OWIN &amp; JavaScript</h2><p>The purpose of this post is to show the different SignalR implementations available for an OWIN WebApi &amp; JavaScript.</p>
+<hr>
+<h2 id="OWIN-WebApi"><a href="#OWIN-WebApi" class="headerlink" title="OWIN WebApi"></a>OWIN WebApi</h2><p>NuGet Packages used:</p>
+<ul>
+<li>Microsoft.Owin.SelfHost</li>
+<li>Microsoft.AspNet.SignalR.SelfHost</li>
+<li>And all related dependencies</li>
+</ul>
+<p>To get started, follow the tutorial <a href="http://www.asp.net/signalr/overview/deployment/tutorial-signalr-self-host" target="_blank" rel="noopener">here</a></p>
+<p>In the Startup class, where the OWIN configuration is set, we must include the SignalR configuration to run in the same pipeline.</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configuration</span>(<span class="params">IAppBuilder app</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">var</span> httpConfiguration = SetupHttpConfiguration();</span><br><span class="line">  app.UseWebApi(httpConfiguration);</span><br><span class="line"></span><br><span class="line">  app.Map(<span class="string">"/signalr"</span>, map =&gt;</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">// Setup the cors middleware to run before SignalR.</span></span><br><span class="line">    <span class="comment">// By default this will allow all origins. You can </span></span><br><span class="line">    <span class="comment">// configure the set of origins and/or http verbs by</span></span><br><span class="line">    <span class="comment">// providing a cors options with a different policy.</span></span><br><span class="line">    map.UseCors(CorsOptions.AllowAll);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> hubConfiguration = <span class="keyword">new</span> HubConfiguration</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// You can enable JSONP by uncommenting line below.</span></span><br><span class="line">      <span class="comment">// JSONP requests are insecure but some older browsers (and some</span></span><br><span class="line">      <span class="comment">// versions of IE) require JSONP to work cross domain</span></span><br><span class="line">      <span class="comment">// EnableJSONP = true</span></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Run the SignalR pipeline. We're not using MapSignalR</span></span><br><span class="line">    <span class="comment">// since this branch already runs under the "/signalr" path.</span></span><br><span class="line">    map.RunSignalR(hubConfiguration);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The following 2 hubs purely to show the difference of how they will be used in the front-end.</p>
+<ul>
+<li><h4 id="Generated-Proxy-Hub"><a href="#Generated-Proxy-Hub" class="headerlink" title="Generated Proxy Hub"></a>Generated Proxy Hub</h4><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">GeneratedProxyHub</span> : <span class="title">Hub</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">// http://stackoverflow.com/questions/31169509/signalr-how-to-truly-call-a-hubs-method-from-the-server-c-sharp</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> IHubContext context = GlobalHost.ConnectionManager.GetHubContext&lt;GeneratedProxyHub&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> Task <span class="title">OnConnected</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> qs = Context.QueryString[<span class="string">"user"</span>];</span><br><span class="line">    Send(<span class="string">"GeneratedProxyHub"</span>, qs);    </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">base</span>.OnConnected();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Send</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">string</span> message</span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    Clients.All.addMessage(name, <span class="string">"Generated Proxy Hub: "</span> + message);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Push</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">string</span> message</span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    context.Clients.All.addMessage(name, <span class="string">"Generated Proxy Hub: "</span> + message);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>There is nothing special in the setup between them, except for the <code>IHubContext</code> in the <a href="#Generated-Proxy-Hub">Generated Proxy Hub (above)</a>. That is only used when calling <code>Push()</code> from a controller <a href="#SignalR-access-from-ApiController">as explained later</a>. So the <code>IHubContext</code> can be removed safely without breaking the normal functionality.</p>
+<ul>
+<li><h4 id="Manual-Proxy-Hub"><a href="#Manual-Proxy-Hub" class="headerlink" title="Manual Proxy Hub"></a>Manual Proxy Hub</h4><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ManualProxyHub</span> : <span class="title">Hub</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> Task <span class="title">OnConnected</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> qs = Context.QueryString[<span class="string">"manualProxyUser"</span>];</span><br><span class="line">    ManualProxySend(<span class="string">"ManualProxyHub"</span>, qs);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">base</span>.OnConnected();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ManualProxySend</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">string</span> message</span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    Clients.All.addManualMessage(name, <span class="string">"Manual Proxy Hub: "</span> +  message);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ManualProxyPush</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">string</span> message</span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    Clients.All.addManualMessage(name, <span class="string">"Manual Proxy Hub: "</span> + message);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h2 id="Front-End"><a href="#Front-End" class="headerlink" title="Front-End"></a>Front-End</h2><p>The 2 front-end implementations are: (best explained <a href="http://www.asp.net/signalr/overview/guide-to-the-api/hubs-api-guide-javascript-client" target="_blank" rel="noopener">here</a>)</p>
+<ul>
+<li>Generated Proxy</li>
+<li>Manual Proxy (without generated proxy)</li>
+</ul>
+<p>The major difference being:</p>
+<ul>
+<li><p><em>Generated Proxy:</em> Gets the hub’s context in a <code>.js</code> script generated by the SignalR WebApi on page load via <code>&lt;script&gt;</code> tags from the <code>index.html</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">"bower_components/signalr/jquery.signalR.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line">&lt;script src=<span class="string">"http://localhost:9000/signalr/hubs"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>  Usage:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> generatedProxy = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// By default, the hub location is the current server</span></span><br><span class="line">  <span class="comment">// if you are connecting to a different server, specify the URL before calling the start method, </span></span><br><span class="line">  $.connection.hub.url = <span class="string">"http://localhost:9000/signalr"</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// Declare a proxy to reference the hub.</span></span><br><span class="line">  <span class="keyword">var</span> generatedProxyHub = $.connection.generatedProxyHub;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create a function that the hub can call to broadcast messages.</span></span><br><span class="line">  generatedProxyHub.client.addMessage = <span class="function"><span class="keyword">function</span> (<span class="params">name, message</span>) </span>&#123;</span><br><span class="line">    addMessage(name, message);</span><br><span class="line">  &#125;;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// add querystring to send data to server on connect</span></span><br><span class="line">  $.connection.hub.qs = &#123; <span class="string">'user'</span> : username &#125;;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// Start the connection.</span></span><br><span class="line">  $.connection.hub.start().done(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    $(<span class="string">'#sendmessage'</span>).click(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">// Call the Send method on the hub.</span></span><br><span class="line">      generatedProxyHub.server.send($(<span class="string">'#displayname'</span>).val(), $(<span class="string">'#message'</span>).val());</span><br><span class="line">      <span class="comment">// Clear text box and reset focus for next comment.</span></span><br><span class="line">      $(<span class="string">'#message'</span>).val(<span class="string">''</span>).focus();</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><em>Manual Proxy:</em> Only accessing the hubs when needed. Notice the custom <code>createHubProxy(&quot;ManualProxyHub&quot;)</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> manualProxy = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// declare connection and proxy to communicate with the hub</span></span><br><span class="line">  <span class="keyword">var</span> hubConnection = $.hubConnection(<span class="string">"http://localhost:9000/signalr"</span>);</span><br><span class="line">  <span class="keyword">var</span> hubProxy = hubConnection.createHubProxy(<span class="string">"ManualProxyHub"</span>);</span><br><span class="line">  </span><br><span class="line">  hubProxy.on(<span class="string">"addManualMessage"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">name, message</span>) </span>&#123;</span><br><span class="line">    addMessage(name, message);</span><br><span class="line">  &#125;);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// add querystring to send data to server on connect</span></span><br><span class="line">  hubConnection.qs = &#123; <span class="string">'manualProxyUser'</span> : username &#125;;</span><br><span class="line">  </span><br><span class="line">  hubConnection.start().done(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    $(<span class="string">'#sendManualProxyMessage'</span>).click(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">// Call the Push method on the manual proxy hub.</span></span><br><span class="line">      hubProxy.invoke(<span class="string">'ManualProxyPush'</span>, $(<span class="string">'#displayname'</span>).val(), $(<span class="string">'#message'</span>).val());</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// Clear text box and reset focus for next comment.</span></span><br><span class="line">      $(<span class="string">'#message'</span>).val(<span class="string">''</span>).focus();</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>Other small differences include dynamic function calls vs event binding and invoking methods.</p>
+<h2 id="SignalR-access-from-ApiController"><a href="#SignalR-access-from-ApiController" class="headerlink" title="SignalR access from ApiController"></a>SignalR access from ApiController</h2><p>As requests to an ApiController has a HTTP Context, we need to get the context for the Hub’s WebSocket protocol.</p>
+<p>For ease of use I have created a static IHubContext in the <a href="#Generated-Proxy-Hub">Generated Proxy Hub (above)</a> which can be used when calling the Hub’s methods from the controllers, as seen <a href="https://stackoverflow.com/a/31063193/5954805" target="_blank" rel="noopener">here</a>.</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TestController</span> : <span class="title">ApiController</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">string</span> <span class="title">Get</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    GeneratedProxyHub.Push(<span class="string">"WebApi"</span>, <span class="string">"Hello World!"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Result sent to request and connected SignalR hub clients"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Resources"><a href="#Resources" class="headerlink" title="Resources"></a>Resources</h3><p>Demo Source Code: <a href="https://github.com/johan-v-r/SignalR" target="_blank" rel="noopener">https://github.com/johan-v-r/SignalR</a></p>
+<p><a href="http://www.asp.net/signalr/overview/deployment/tutorial-signalr-self-host" target="_blank" rel="noopener">http://www.asp.net/signalr/overview/deployment/tutorial-signalr-self-host</a></p>
+<p><a href="http://www.asp.net/signalr/overview/guide-to-the-api/hubs-api-guide-javascript-client" target="_blank" rel="noopener">http://www.asp.net/signalr/overview/guide-to-the-api/hubs-api-guide-javascript-client</a></p>
+<p><a href="http://stackoverflow.com/questions/31169509/signalr-how-to-truly-call-a-hubs-method-from-the-server-c-sharp" target="_blank" rel="noopener">http://stackoverflow.com/questions/31169509/signalr-how-to-truly-call-a-hubs-method-from-the-server-c-sharp</a></p>
+<p><a href="https://stackoverflow.com/a/31063193/5954805" target="_blank" rel="noopener">https://stackoverflow.com/a/31063193/5954805</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://johan-v-r.github.io/2017/06/06/SignalR/" data-id="cjlpbuxcr0002ach15yr8su2x" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/05/NET-Core-Global-Tools-Configuration/">.NET Core Global Tools Configuration</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/26/Xamarin-Forms-Chat-Bot/">Xamarin Forms Chat Bot</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/26/ECMAScript-vs-TypeScript/">ECMAScript vs TypeScript</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/06/SignalR/">SignalR</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Johan van Rensburg<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
